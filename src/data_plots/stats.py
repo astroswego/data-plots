@@ -4,6 +4,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 from matplotlib import rcParams
+from scipy.optimize import curve_fit
 
 from data_plots.utils import labeler, titler
 
@@ -55,6 +56,10 @@ def scatter_hist(x, y, *args,
     n, xbins, xpatches = axHistx.hist(x, bins=xbins, normed=1)
     n, ybins, ypatches = axHisty.hist(y, bins=ybins, normed=1,
                                       orientation='horizontal')
+
+    
+
+    
     mean_formatter = r'$\mu = {0:.5f}$'.format
     std_formatter = r'$\sigma = {0:.5f}$'.format
     xhandles, yhandles = [], []
@@ -72,13 +77,14 @@ def scatter_hist(x, y, *args,
         xhandles.append(p)
         yhandles.append(p)
 
-#    exit(print(xlegend,ylegend))
     if show_mean or show_std:
         axHistx.legend(xhandles, xlabels,
                        fontsize='small', loc='upper right')
         axHisty.legend(xhandles, xlabels,
                        fontsize='small', loc='upper right')
 
+    
+        
     xpdf = mlab.normpdf(xbins, x_mean, x_std)
     ypdf = mlab.normpdf(ybins, y_mean, y_std)
 
@@ -88,6 +94,9 @@ def scatter_hist(x, y, *args,
     axHistx.set_xlim(axScatter.get_xlim())
     axHisty.set_ylim(axScatter.get_ylim())
 
+    axHistx.locator_params(tight=False, nbins=3)
+    axHisty.locator_params(tight=False, nbins=3)
+
     axHistx = titler(axHistx, **kwargs)
     axScatter = labeler(axScatter, **kwargs)
 
@@ -96,3 +105,7 @@ def scatter_hist(x, y, *args,
 def scatter_hist_from_file(input, *args, usecols=range(2), **kwargs):
     x, y = numpy.loadtxt(input, usecols=usecols, unpack=True)
     return scatter_hist(x, y, *args, **kwargs)
+
+def _gauss(x, *p):
+    A, mu, sigma = p
+    return A*numpy.exp(-(x-mu)**2/(2.*sigma**2))

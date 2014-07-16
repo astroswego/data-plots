@@ -1,5 +1,6 @@
 from argparse import ArgumentParser, ArgumentError, SUPPRESS
 from os import path
+from data_plots.scatter import scatter3d_from_file
 from data_plots.stats import scatter_hist_from_file
 
 
@@ -10,6 +11,13 @@ def get_args():
     single_output_parser.add_argument('--filename',
         type=str,
         help='Name of file to save (does not include extension)')
+    threedee_parser = ArgumentParser(add_help=False)
+    threedee_parser.add_argument('--azimuth', dest='azim',
+        type=float, default=0.0,
+        help='Azimuth angle for 3D plot.')
+    threedee_parser.add_argument('--elevation', dest='elev',
+        type=float, default=0.0,
+        help='Elevation angle for 3D plot.')
 
     parser = ArgumentParser(prog='data-plots')
     label_parser = parser.add_argument_group('Labels')
@@ -57,6 +65,11 @@ def get_args():
     scatter_hist_parser.set_defaults(plot=scatter_hist_from_file,
                                      filename='scatter_hist')
 
+    scatter3d_parser = plot_parser.add_parser('scatter3d',
+        parents=[single_output_parser, threedee_parser])
+    scatter3d_parser.set_defaults(plot=scatter3d_from_file,
+                                  filename='scatter3d')
+
     return parser.parse_args()
 
 def main():
@@ -66,5 +79,5 @@ def main():
     if args.show_only:
         fig.show()
     else:
-        fig.savefig(path.join(args.output, args.filename + args.type))
+        fig.savefig(path.join(args.output, args.filename))
     fig.clf()

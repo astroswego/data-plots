@@ -11,7 +11,9 @@ from data_plots.utils import labeler, titler
 rcParams['text.usetex'] = True
 
 def scatter_hist(x, y, *args,
-        binwidth=0.25, linestyle='r--',
+        bins=10,
+        linestyle='r--', scatterstyle='k+',
+        histtype='stepfilled', facecolor='#FFFFFF', hatch='/',
         show_mean=True, show_std=True,
         **kwargs):
     # no labels
@@ -38,25 +40,27 @@ def scatter_hist(x, y, *args,
     axHisty.yaxis.set_major_formatter(nullfmt)
 
     # the scatter plot:
-    axScatter.scatter(x, y)
+    axScatter.plot(x, y, scatterstyle)
 
     # determine limits
     xmin, ymin = numpy.min(x), numpy.min(y)
     xmax, ymax = numpy.max(x), numpy.max(y)
     x_mean, y_mean = x.mean(), y.mean()
     x_std,  y_std  = x.std(),  y.std()
-    xlims = ((numpy.array([-xmin, xmax]) // binwidth) + 1) * binwidth
-    ylims = ((numpy.array([-ymin, ymax]) // binwidth) + 1) * binwidth
+#    xlims = ((numpy.array([-xmin, xmax]) // binwidth) + 1) * binwidth
+#    ylims = ((numpy.array([-ymin, ymax]) // binwidth) + 1) * binwidth
+    xbins = numpy.linspace(xmin, xmax, bins)
+    ybins = numpy.linspace(ymin, ymax, bins)
 
-#    axScatter.set_xlim(xlims)
-#    axScatter.set_ylim(ylims)
-
-    xbins = numpy.arange(-xlims[0], xlims[1]+binwidth, binwidth)
-    ybins = numpy.arange(-ylims[0], ylims[1]+binwidth, binwidth)
-    n, xbins, xpatches = axHistx.hist(x, bins=xbins, normed=1)
+#    xbins = numpy.arange(-xlims[0], xlims[1]+binwidth, binwidth)
+#    ybins = numpy.arange(-ylims[0], ylims[1]+binwidth, binwidth)
+    n, xbins, xpatches = axHistx.hist(x, bins=xbins, normed=1,
+                                      histtype=histtype, facecolor=facecolor,
+                                      hatch=hatch)
     n, ybins, ypatches = axHisty.hist(y, bins=ybins, normed=1,
+                                      histtype=histtype, facecolor=facecolor,
+                                      hatch=hatch,
                                       orientation='horizontal')
-
     
 
     
